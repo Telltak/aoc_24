@@ -27,11 +27,25 @@ mul(888,16`)
 func TestRegexr(t *testing.T) {
 	example_data := "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))"
 
-	calcs := find_calculations(example_data)
+	calcs := find_calculations(example_data, false)
 	expected := []Calculation{
 		{Mul, 2, 4},
 		{Mul, 5, 5},
 		{Mul, 11, 8},
+		{Mul, 8, 5},
+	}
+
+	if !reflect.DeepEqual(expected, calcs) {
+		t.Errorf("Expected %#v but got %#v", expected, calcs)
+	}
+}
+
+func TestRegexrConditional(t *testing.T) {
+	example_data := "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
+
+	calcs := find_calculations(example_data, true)
+	expected := []Calculation{
+		{Mul, 2, 4},
 		{Mul, 8, 5},
 	}
 
